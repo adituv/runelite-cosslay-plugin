@@ -10,7 +10,7 @@ repositories {
 	mavenCentral()
 }
 
-def runeLiteVersion = '1.7.12-SNAPSHOT'
+def runeLiteVersion = '1.7.12'
 
 dependencies {
 	implementation 'org.jetbrains:annotations:20.1.0'
@@ -26,7 +26,7 @@ dependencies {
 
 group = 'com.github.adituv.cosslayplugin'
 version = '1.0-SNAPSHOT'
-sourceCompatibility = "11"
+sourceCompatibility = '11'
 
 tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'

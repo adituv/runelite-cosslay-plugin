@@ -198,10 +198,10 @@ public enum KitPart
 	// endregion Boots
 	;
 
-	private String id;
-	private int partId;
-	private int menuIdx;
-	private String name;
+	private final String id;
+	private final int partId;
+	private final int menuIdx;
+	private final String name;
 
 	KitPart(int partId, int menuIdx, String name)
 	{
