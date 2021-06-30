@@ -13,6 +13,7 @@ import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.ItemQuantityMode;
+import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetInfo;
@@ -43,6 +44,7 @@ public final class CosslayPlugin extends Plugin
 	private boolean shouldOverrideDialog = true;
 	private FakeDialogChain cosmoDialogChain;
 	private boolean equipmentInterfaceOverridden = false;
+	private MenuEntry overrideMenuEntry = null;
 
 	@Override
 	protected void startUp() throws Exception
@@ -111,6 +113,13 @@ public final class CosslayPlugin extends Plugin
 
 	private void setupCosslayInterface()
 	{
+		Widget inventory = client.getWidget(85, 0);
+
+		for (Widget w : inventory.getChildren())
+		{
+			w.setOpacity(128);
+		}
+
 		client.getWidget(84, 4).setHidden(true);
 		client.getWidget(84, 21).setHidden(true);
 		client.getWidget(84, 43).setHidden(true);
@@ -140,6 +149,21 @@ public final class CosslayPlugin extends Plugin
 		{
 			Widget weapon = client.getWidget(84, 13);
 			weapon.setName("<col=ff9040>Black 2h sword</col>");
+			weapon.setOnMouseOverListener((JavaScriptCallback) e ->
+			{
+				overrideMenuEntry = new MenuEntry();
+				overrideMenuEntry.setOption("Lookup");
+				overrideMenuEntry.setTarget("<col=ff9040>Black 2h sword</col>");
+				overrideMenuEntry.setIdentifier(-1);
+				overrideMenuEntry.setForceLeftClick(true);
+				overrideMenuEntry.setType(MenuAction.RUNELITE.getId());
+				overrideMenuEntry.setParam0(ItemID.BLACK_2H_SWORD);
+				overrideMenuEntry.setParam1(weapon.getId());
+			});
+			weapon.setOnMouseLeaveListener((JavaScriptCallback) e ->
+			{
+				overrideMenuEntry = null;
+			});
 			weapon.getChild(1).setHidden(false);
 			weapon.getChild(1).setItemId(ItemID.BLACK_2H_SWORD);
 			weapon.getChild(1).setItemQuantityMode(ItemQuantityMode.NEVER);
@@ -218,6 +242,8 @@ public final class CosslayPlugin extends Plugin
 		int widgetChildId = WidgetInfo.TO_CHILD(e.getWidgetId());
 		String option = e.getMenuOption();
 
+		if ()
+
 		if (equipmentInterfaceOverridden && widgetGroupId == 84 && widgetChildId >= 10 && widgetChildId <= 20)
 		{
 			if (e.getMenuAction() == MenuAction.CC_OP)
@@ -251,6 +277,15 @@ public final class CosslayPlugin extends Plugin
 	@Subscribe
 	private void onClientTick(ClientTick e)
 	{
+		if (overrideMenuEntry != null)
+		{
+			MenuEntry[] originalEntries = client.getMenuEntries();
+			MenuEntry[] newEntries = new MenuEntry[originalEntries.length + 1];
+			System.arraycopy(originalEntries, 0, newEntries, 0, originalEntries.length);
+			newEntries[originalEntries.length] = overrideMenuEntry;
+			client.setMenuEntries(newEntries);
+		}
+
 		if (client.getVar(VarClientInt.INVENTORY_TAB) == 4)
 		{
 			boolean shiftPressed = client.isKeyPressed(KC_SHIFT);
@@ -289,19 +324,36 @@ public final class CosslayPlugin extends Plugin
 	@Subscribe
 	private void onMenuEntryAdded(MenuEntryAdded e)
 	{
-		if (!equipmentInterfaceOverridden
-			|| e.getActionParam1() < WidgetInfo.PACK(84, 10)
-			|| e.getActionParam1() > WidgetInfo.PACK(84, 20))
+		if (!equipmentInterfaceOverridden)
 		{
 			return;
 		}
 
-		if (e.getOption().equals("Remove"))
+		if (e.getActionParam1() >= WidgetInfo.PACK(84, 10)
+			&& e.getActionParam1() <= WidgetInfo.PACK(84, 20)
+			&& e.getOption().equals("Remove"))
 		{
 			MenuEntry[] entries = client.getMenuEntries();
 			MenuEntry[] newEntries = new MenuEntry[entries.length - 1];
 			System.arraycopy(entries, 0, newEntries, 0, entries.length - 1);
 			client.setMenuEntries(newEntries);
+		}
+
+		if (e.getActionParam1() == WidgetInfo.PACK(85, 0))
+		{
+			Widget w = client.getWidget(84, 0);
+			if (w == null || w.isHidden())
+			{
+				return;
+			}
+
+			if (e.getOption().equals("Equip"))
+			{
+				MenuEntry[] entries = client.getMenuEntries();
+				MenuEntry[] newEntries = new MenuEntry[entries.length - 1];
+				System.arraycopy(entries, 0, newEntries, 0, entries.length - 1);
+				client.setMenuEntries(newEntries);
+			}
 		}
 	}
 }
