@@ -17,6 +17,7 @@ import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.api.widgets.WidgetType;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.chatbox.ChatboxPanelManager;
@@ -222,17 +223,25 @@ public final class CosslayPlugin extends Plugin
 			ammo.getChild(2).setHidden(false);
 		}
 
-		// Inventory - skull
-
 		client.getWidget(84, 3).getChild(1).setText("Easy Tier - General Khazard");
 
-		{
-			Widget w = client.getWidget(84, 8);
-			w.setOriginalWidth(135);
-			w.revalidate();
-		}
+		Widget parent = client.getWidget(84, 0);
+		Widget bg = parent.createChild(-1, WidgetType.GRAPHIC);
+		bg.setSpriteId(179);
+		bg.setOriginalWidth(36);
+		bg.setOriginalHeight(36);
+		bg.setOriginalX(189);
+		bg.setOriginalY(145);
+		bg.revalidate();
 
-
+		Widget inv = parent.createChild(-1, WidgetType.GRAPHIC);
+		inv.setItemId(ItemID.SKULL);
+		inv.setItemQuantityMode(ItemQuantityMode.NEVER);
+		inv.setOriginalWidth(36);
+		inv.setOriginalHeight(32);
+		inv.setOriginalX(191);
+		inv.setOriginalY(147);
+		inv.revalidate();
 	}
 
 	@Subscribe
@@ -241,8 +250,6 @@ public final class CosslayPlugin extends Plugin
 		int widgetGroupId = WidgetInfo.TO_GROUP(e.getWidgetId());
 		int widgetChildId = WidgetInfo.TO_CHILD(e.getWidgetId());
 		String option = e.getMenuOption();
-
-		if ()
 
 		if (equipmentInterfaceOverridden && widgetGroupId == 84 && widgetChildId >= 10 && widgetChildId <= 20)
 		{
