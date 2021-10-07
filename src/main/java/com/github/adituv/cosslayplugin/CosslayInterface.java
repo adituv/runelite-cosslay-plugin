@@ -1,5 +1,6 @@
 package com.github.adituv.cosslayplugin;
 
+import com.github.adituv.cosslayplugin.model.CostumeNpc;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,8 @@ public final class CosslayInterface
 	// endregion
 
 	private final Client client;
+
+	private CostumeNpc npc;
 
 	private Widget root;
 	private Widget titleText;
@@ -213,7 +216,6 @@ public final class CosslayInterface
 
 		for (int i = 0; i < 4; i++)
 		{
-			// dy = 39
 			Widget background = this.root.createChild(-1, WidgetType.GRAPHIC);
 			background.setSpriteId(SpriteID.EQUIPMENT_SLOT_TILE);
 			background.setOriginalX(189);

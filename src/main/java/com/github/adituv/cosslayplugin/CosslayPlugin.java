@@ -2,7 +2,7 @@ package com.github.adituv.cosslayplugin;
 
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
+import net.runelite.api.Client;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
@@ -27,9 +27,12 @@ public final class CosslayPlugin extends Plugin
 	@Subscribe
 	private void onWidgetLoaded(WidgetLoaded e)
 	{
-		if (e.getGroupId() == CosslayInterface.WORN_ITEMS_GROUP_ID)
+		clientThread.invokeLater(() ->
 		{
-			cosslayInterface.createInterface();
-		}
+			if (e.getGroupId() == CosslayInterface.WORN_ITEMS_GROUP_ID)
+			{
+				cosslayInterface.createInterface();
+			}
+		});
 	}
 }
